@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # tinycode installation script
-# Version: 1.0.1
+# Version: 1.0.2
 
 set -e
 
@@ -14,6 +14,57 @@ NC='\033[0m' # No Color
 
 # Installation directories
 CONFIG_DIR="$HOME/.config/tinycode"
+
+# Function for manual installation (defined at the top)
+_install_manual() {
+    echo -e "${YELLOW}Installing Python dependencies manually...${NC}"
+    
+    # Try to install dependencies using system package manager
+    if command -v apt &> /dev/null; then
+        echo -e "${YELLOW}Detected apt package manager${NC}"
+        echo "Please install Python dependencies manually:"
+        echo "  sudo apt install python3-requests python3-click python3-colorama"
+        echo "  pip3 install openai anthropic python-dotenv"
+    elif command -v yum &> /dev/null; then
+        echo -e "${YELLOW}Detected yum package manager${NC}"
+        echo "Please install Python dependencies manually:"
+        echo "  sudo yum install python3-requests python3-click python3-colorama"
+        echo "  pip3 install openai anthropic python-dotenv"
+    elif command -v dnf &> /dev/null; then
+        echo -e "${YELLOW}Detected dnf package manager${NC}"
+        echo "Please install Python dependencies manually:"
+        echo "  sudo dnf install python3-requests python3-click python3-colorama"
+        echo "  pip3 install openai anthropic python-dotenv"
+    elif command -v pacman &> /dev/null; then
+        echo -e "${YELLOW}Detected pacman package manager${NC}"
+        echo "Please install Python dependencies manually:"
+        echo "  sudo pacman -S python-requests python-click python-colorama"
+        echo "  pip install openai anthropic python-dotenv"
+    else
+        echo "Please install the following Python packages manually:"
+        echo "  requests, click, colorama, openai, anthropic, python-dotenv"
+    fi
+    
+    # Try to find a writable location for the script
+    if [[ -w "/usr/local/bin" ]]; then
+        cp "$SCRIPT_DIR/tinycode" "/usr/local/bin/"
+        chmod +x "/usr/local/bin/tinycode"
+        echo -e "${GREEN}✓ tinycode installed to /usr/local/bin/tinycode${NC}"
+    else
+        USER_BIN="$HOME/.local/bin"
+        mkdir -p "$USER_BIN"
+        cp "$SCRIPT_DIR/tinycode" "$USER_BIN/"
+        chmod +x "$USER_BIN/tinycode"
+        echo -e "${GREEN}✓ tinycode installed to $USER_BIN/tinycode${NC}"
+        
+        # Check if user bin is in PATH
+        if [[ ":$PATH:" != *":$USER_BIN:"* ]]; then
+            echo -e "${YELLOW}Note: $USER_BIN is not in your PATH${NC}"
+            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
+            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
+        fi
+    fi
+}
 
 echo -e "${BLUE}tinycode - AI-powered command line generator${NC}"
 echo -e "${BLUE}=============================================${NC}"
@@ -133,12 +184,27 @@ if [[ "$PIP_AVAILABLE" == "true" ]]; then
     # Install in user mode to avoid permission issues
     $PIP_COMMAND install --user .
     
-    # Check if installation was successful
+    # Check if installation was successful - look in multiple locations
+    TINYCODE_FOUND=false
+    TINYCODE_PATH=""
+    
+    # Check common locations
+    for path in "$HOME/.local/bin/tinycode" "/usr/local/bin/tinycode" "/usr/bin/tinycode"; do
+        if [[ -f "$path" ]]; then
+            TINYCODE_FOUND=true
+            TINYCODE_PATH="$path"
+            break
+        fi
+    done
+    
+    # Also check if it's in PATH
     if command -v tinycode &> /dev/null; then
-        echo -e "${GREEN}✓ tinycode installed successfully${NC}"
-        
-        # Get the actual location of the installed command
+        TINYCODE_FOUND=true
         TINYCODE_PATH=$(which tinycode)
+    fi
+    
+    if [[ "$TINYCODE_FOUND" == "true" ]]; then
+        echo -e "${GREEN}✓ tinycode installed successfully${NC}"
         echo -e "${GREEN}✓ Command available at: $TINYCODE_PATH${NC}"
         
         # Check if it's in a standard PATH location
@@ -147,6 +213,17 @@ if [[ "$PIP_AVAILABLE" == "true" ]]; then
         else
             echo -e "${YELLOW}Note: Command installed to: $TINYCODE_PATH${NC}"
             echo "Make sure this location is in your PATH"
+        fi
+        
+        # Check if .local/bin is in PATH and warn if not
+        USER_BIN="$HOME/.local/bin"
+        if [[ ":$PATH:" != *":$USER_BIN:"* ]] && [[ -f "$USER_BIN/tinycode" ]]; then
+            echo -e "${YELLOW}Note: $USER_BIN is not in your PATH${NC}"
+            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
+            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
+            echo
+            echo "Or run this command to add it temporarily:"
+            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
         fi
     else
         echo -e "${RED}Error: tinycode installation failed${NC}"
@@ -173,55 +250,4 @@ echo
 echo "3. Try it out:"
 echo "   tinycode \"list all files in current directory\""
 echo
-echo -e "${BLUE}For more information, visit: https://github.com/your-repo/tinycode${NC}"
-
-# Function for manual installation
-_install_manual() {
-    echo -e "${YELLOW}Installing Python dependencies manually...${NC}"
-    
-    # Try to install dependencies using system package manager
-    if command -v apt &> /dev/null; then
-        echo -e "${YELLOW}Detected apt package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo apt install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v yum &> /dev/null; then
-        echo -e "${YELLOW}Detected yum package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo yum install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v dnf &> /dev/null; then
-        echo -e "${YELLOW}Detected dnf package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo dnf install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v pacman &> /dev/null; then
-        echo -e "${YELLOW}Detected pacman package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo pacman -S python-requests python-click python-colorama"
-        echo "  pip install openai anthropic python-dotenv"
-    else
-        echo "Please install the following Python packages manually:"
-        echo "  requests, click, colorama, openai, anthropic, python-dotenv"
-    fi
-    
-    # Try to find a writable location for the script
-    if [[ -w "/usr/local/bin" ]]; then
-        cp "$SCRIPT_DIR/tinycode" "/usr/local/bin/"
-        chmod +x "/usr/local/bin/tinycode"
-        echo -e "${GREEN}✓ tinycode installed to /usr/local/bin/tinycode${NC}"
-    else
-        USER_BIN="$HOME/.local/bin"
-        mkdir -p "$USER_BIN"
-        cp "$SCRIPT_DIR/tinycode" "$USER_BIN/"
-        chmod +x "$USER_BIN/tinycode"
-        echo -e "${GREEN}✓ tinycode installed to $USER_BIN/tinycode${NC}"
-        
-        # Check if user bin is in PATH
-        if [[ ":$PATH:" != *":$USER_BIN:"* ]]; then
-            echo -e "${YELLOW}Note: $USER_BIN is not in your PATH${NC}"
-            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
-            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
-        fi
-    fi
-} 
+echo -e "${BLUE}For more information, visit: https://github.com/your-repo/tinycode${NC}" 
