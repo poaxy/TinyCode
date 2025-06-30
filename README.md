@@ -18,6 +18,9 @@
 git clone https://github.com/your-repo/tinycode.git
 cd tinycode
 
+#Make the file executable
+chmod +x install.sh
+
 # Run the installation script
 ./install.sh
 ```
