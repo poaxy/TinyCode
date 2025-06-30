@@ -1,0 +1,307 @@
+Metadata-Version: 2.4
+Name: tinycode
+Version: 1.0.0
+Summary: AI-powered command line generator using ChatGPT and Claude APIs
+Home-page: https://github.com/your-repo/tinycode
+Author: Your Name
+Author-email: your.email@example.com
+Project-URL: Bug Reports, https://github.com/your-repo/tinycode/issues
+Project-URL: Source, https://github.com/your-repo/tinycode
+Project-URL: Documentation, https://github.com/your-repo/tinycode#readme
+Keywords: cli,ai,command-line,linux,openai,claude,automation
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: System :: Systems Administration
+Classifier: Topic :: Utilities
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.28.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: colorama>=0.4.6
+Requires-Dist: openai>=1.0.0
+Requires-Dist: anthropic>=0.7.0
+Requires-Dist: python-dotenv>=1.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# tinycode
+
+AI-powered command line generator that uses ChatGPT and Claude APIs to generate single-line Linux commands.
+
+## Features
+
+- 🤖 **AI-Powered**: Uses OpenAI (ChatGPT) and Anthropic (Claude) APIs
+- 🎯 **Single Command Output**: Returns only the command you need, no explanations
+- 🐧 **Linux Distribution Aware**: Automatically detects your Linux distribution for better command generation
+- 🔄 **Automatic API Selection**: Uses available API or falls back between them
+- ⚡ **Animated Loading**: Shows loading animation while generating commands
+- 🎨 **Modern CLI**: Clean, intuitive command-line interface
+- 📋 **Copy to Clipboard**: Optional clipboard integration
+- ⚙️ **Configurable**: Easy API key management and settings
+
+## Installation
+
+### Quick Install
+
+```bash
+# Clone or download the repository
+git clone https://github.com/your-repo/tinycode.git
+cd tinycode
+
+# Run the installation script
+./install.sh
+```
+
+### Manual Install
+
+```bash
+# Install Python dependencies
+pip3 install --user requests click colorama openai anthropic python-dotenv
+
+# Copy the script to your PATH
+sudo cp tinycode /usr/local/bin/
+sudo chmod +x /usr/local/bin/tinycode
+```
+
+## Configuration
+
+### Set API Keys
+
+You need at least one API key to use tinycode:
+
+```bash
+# Set OpenAI API key
+tinycode --set-api-key openai sk-your-openai-key-here
+
+# Set Claude API key
+tinycode --set-api-key claude sk-ant-your-claude-key-here
+```
+
+### Get API Keys
+
+- **OpenAI**: Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+- **Claude**: Get your API key from [Anthropic Console](https://console.anthropic.com/)
+
+## Usage
+
+### Basic Usage
+
+```bash
+# Simple command generation
+tinycode "what command I need to be able to ssh to ip 192.168.2.45 on port 2222?"
+
+# Remove all files in a directory
+tinycode "give me a code to remove all files in a directory"
+
+# Find files modified in last 24 hours
+tinycode "find all files modified in last 24 hours"
+```
+
+### API Selection
+
+```bash
+# Force use of OpenAI
+tinycode --openai "compress a directory to tar.gz"
+
+# Force use of Claude
+tinycode --claude "install nginx web server"
+```
+
+### Configuration and Status
+
+```bash
+# Check available APIs
+tinycode --check-apis
+
+# Show current configuration
+tinycode --config
+
+# Reset configuration to defaults
+tinycode --reset-config
+
+# Show version
+tinycode --version
+
+# Show help
+tinycode --help
+```
+
+## Examples
+
+### System Administration
+
+```bash
+# Install packages
+tinycode "install nginx web server"
+# Output: sudo apt install nginx
+
+# Check disk usage
+tinycode "check disk usage of current directory"
+# Output: du -sh .
+
+# Find large files
+tinycode "find files larger than 100MB"
+# Output: find . -type f -size +100M
+```
+
+### Network and SSH
+
+```bash
+# SSH with custom port
+tinycode "ssh to 192.168.1.100 on port 2222"
+# Output: ssh -p 2222 user@192.168.1.100
+
+# Check if port is open
+tinycode "check if port 80 is open on localhost"
+# Output: netstat -tuln | grep :80
+```
+
+### File Operations
+
+```bash
+# Remove all files in directory
+tinycode "remove all files in current directory"
+# Output: rm -rf *
+
+# Find and replace text
+tinycode "find all .txt files and replace 'old' with 'new'"
+# Output: find . -name "*.txt" -exec sed -i 's/old/new/g' {} \;
+
+# Compress directory
+tinycode "compress directory to tar.gz"
+# Output: tar -czf archive.tar.gz directory/
+```
+
+## How It Works
+
+1. **System Detection**: Automatically detects your Linux distribution and package manager
+2. **API Selection**: Chooses the best available API (OpenAI by default, Claude as fallback)
+3. **Context-Aware Prompts**: Includes system information in the AI prompt for better results
+4. **Command Generation**: AI generates a single, executable command
+5. **Output**: Returns only the command, ready to use
+
+## Configuration File
+
+The configuration is stored in `~/.config/tinycode/config.json`:
+
+```json
+{
+  "auto_select_api": true,
+  "preferred_api": "openai",
+  "openai": {
+    "api_key": "sk-...",
+    "model": "gpt-3.5-turbo",
+    "max_tokens": 100,
+    "enabled": true
+  },
+  "claude": {
+    "api_key": "sk-ant-...",
+    "model": "claude-3-sonnet-20240229",
+    "max_tokens": 100,
+    "enabled": true
+  },
+  "system": {
+    "auto_detect_distro": true,
+    "include_distro_in_prompt": true
+  },
+  "ui": {
+    "loading_animation": true,
+    "copy_to_clipboard": false,
+    "animation_style": "dots"
+  }
+}
+```
+
+## Troubleshooting
+
+### No API Keys Configured
+
+```bash
+# Check if APIs are configured
+tinycode --check-apis
+
+# If none are configured, set them up
+tinycode --set-api-key openai YOUR_KEY
+```
+
+### API Connection Issues
+
+```bash
+# Test API connections
+tinycode --check-apis
+
+# Check your internet connection
+ping api.openai.com
+```
+
+### Permission Issues
+
+```bash
+# Make sure the script is executable
+chmod +x /usr/local/bin/tinycode
+
+# Check if it's in your PATH
+which tinycode
+```
+
+## Requirements
+
+- Python 3.7 or higher
+- Internet connection for API access
+- At least one API key (OpenAI or Claude)
+
+## Dependencies
+
+- `requests` - HTTP library
+- `click` - CLI framework
+- `colorama` - Cross-platform colored terminal text
+- `openai` - OpenAI API client
+- `anthropic` - Anthropic API client
+- `python-dotenv` - Environment variable management
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+If you encounter any issues or have questions:
+
+1. Check the troubleshooting section
+2. Open an issue on GitHub
+3. Check the configuration with `tinycode --config`
+
+## Roadmap
+
+- [ ] Support for more AI providers
+- [ ] Command history and favorites
+- [ ] Interactive mode
+- [ ] Command explanation mode
+- [ ] Integration with shell aliases
+- [ ] Plugin system for custom prompts 
