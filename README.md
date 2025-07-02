@@ -381,12 +381,3 @@ If you encounter any issues or have questions:
 2. Run the test script: `./test_installation.sh`
 3. Open an issue on GitHub
 4. Check the configuration with `tinycode --config`
-
-## Roadmap
-
-- [ ] Support for more AI providers
-- [ ] Command history and favorites
-- [ ] Interactive mode
-- [ ] Command explanation mode
-- [ ] Integration with shell aliases
-- [ ] Plugin system for custom prompts 
