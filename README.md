@@ -15,8 +15,8 @@
 
 ```bash
 # Clone or download the repository
-git clone https://github.com/poaxy/TinyCode.git
-cd TinyCode
+git clone https://github.com/poaxy/tinycode.git
+cd tinycode
 
 #Make the file executable
 chmod +x install.sh
@@ -38,8 +38,8 @@ If you prefer manual installation:
 
 ```bash
 # Clone the repository
-git clone https://github.com/poaxy/TinyCode.git
-cd TinyCode
+git clone https://github.com/poaxy/tinycode.git
+cd tinycode
 
 # Install using pip (recommended)
 pip3 install --user .
@@ -66,8 +66,8 @@ For contributors and developers:
 
 ```bash
 # Clone the repository
-git clone https://github.com/poaxy/TinyCode.git
-cd TinyCode
+git clone https://github.com/poaxy/tinycode.git
+cd tinycode
 
 # Run development setup
 ./dev-setup.sh
