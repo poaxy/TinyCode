@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # tinycode uninstall script
-# Version: 1.0.0
+# Version: 2.0.0 - Virtual Environment Support
 
 set -e
 
@@ -16,12 +16,10 @@ echo -e "${BLUE}tinycode - Uninstaller${NC}"
 echo -e "${BLUE}=====================${NC}"
 echo
 
-# Check if running as root
-if [[ $EUID -eq 0 ]]; then
-   echo -e "${RED}Error: This script should not be run as root${NC}"
-   echo "Please run without sudo"
-   exit 1
-fi
+# Installation directories
+VENV_DIR="$HOME/.local/share/tinycode/venv"
+INSTALL_DIR="$HOME/.local/bin"
+CONFIG_DIR="$HOME/.config/tinycode"
 
 # Check if tinycode is installed
 if ! command -v tinycode &> /dev/null; then
@@ -29,38 +27,41 @@ if ! command -v tinycode &> /dev/null; then
     exit 0
 fi
 
-echo -e "${YELLOW}Found tinycode installation at: $(which tinycode)${NC}"
+echo -e "${YELLOW}Found tinycode installation${NC}"
 
-# Uninstall using pip
-echo -e "${YELLOW}Uninstalling tinycode...${NC}"
-if python3 -m pip uninstall tinycode -y; then
-    echo -e "${GREEN}✓ tinycode uninstalled successfully${NC}"
-else
-    echo -e "${RED}Error: Failed to uninstall tinycode using pip${NC}"
-    echo "Trying manual removal..."
-    
-    # Manual removal
-    TINYCODE_PATH=$(which tinycode)
-    if [[ -f "$TINYCODE_PATH" ]]; then
-        rm -f "$TINYCODE_PATH"
-        echo -e "${GREEN}✓ Removed tinycode binary${NC}"
-    fi
+# Remove wrapper script
+if [[ -f "$INSTALL_DIR/tinycode" ]]; then
+    echo -e "${YELLOW}Removing wrapper script...${NC}"
+    rm -f "$INSTALL_DIR/tinycode"
+    echo -e "${GREEN}✓ Wrapper script removed${NC}"
 fi
 
-# Remove configuration directory
-CONFIG_DIR="$HOME/.config/tinycode"
-if [[ -d "$CONFIG_DIR" ]]; then
-    echo -e "${YELLOW}Removing configuration directory...${NC}"
-    rm -rf "$CONFIG_DIR"
-    echo -e "${GREEN}✓ Configuration directory removed${NC}"
+# Remove virtual environment
+if [[ -d "$VENV_DIR" ]]; then
+    echo -e "${YELLOW}Removing virtual environment...${NC}"
+    rm -rf "$VENV_DIR"
+    echo -e "${GREEN}✓ Virtual environment removed${NC}"
+fi
+
+# Remove parent directory if empty
+if [[ -d "$(dirname "$VENV_DIR")" ]] && [[ -z "$(ls -A "$(dirname "$VENV_DIR")")" ]]; then
+    rmdir "$(dirname "$VENV_DIR")"
+    echo -e "${GREEN}✓ Empty parent directory removed${NC}"
+fi
+
+# Ask about configuration removal
+echo -e "${YELLOW}Do you want to remove configuration files? (y/N)${NC}"
+read -r response
+if [[ "$response" =~ ^[Yy]$ ]]; then
+    if [[ -d "$CONFIG_DIR" ]]; then
+        echo -e "${YELLOW}Removing configuration directory...${NC}"
+        rm -rf "$CONFIG_DIR"
+        echo -e "${GREEN}✓ Configuration directory removed${NC}"
+    fi
 else
-    echo -e "${YELLOW}No configuration directory found${NC}"
+    echo -e "${BLUE}Configuration files preserved at: $CONFIG_DIR${NC}"
 fi
 
 echo
 echo -e "${GREEN}Uninstallation completed successfully!${NC}"
-echo
-echo -e "${BLUE}Note:${NC}"
-echo "• Dependencies (openai, anthropic, etc.) were not removed"
-echo "• If you want to remove dependencies, run:"
-echo "  pip3 uninstall openai anthropic requests click colorama python-dotenv" 
+echo -e "${BLUE}Thank you for using tinycode!${NC}" 

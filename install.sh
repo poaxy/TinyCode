@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # tinycode installation script
-# Version: 1.0.2
+# Version: 2.0.0 - Virtual Environment Support
 
 set -e
 
@@ -14,57 +14,8 @@ NC='\033[0m' # No Color
 
 # Installation directories
 CONFIG_DIR="$HOME/.config/tinycode"
-
-# Function for manual installation (defined at the top)
-_install_manual() {
-    echo -e "${YELLOW}Installing Python dependencies manually...${NC}"
-    
-    # Try to install dependencies using system package manager
-    if command -v apt &> /dev/null; then
-        echo -e "${YELLOW}Detected apt package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo apt install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v yum &> /dev/null; then
-        echo -e "${YELLOW}Detected yum package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo yum install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v dnf &> /dev/null; then
-        echo -e "${YELLOW}Detected dnf package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo dnf install python3-requests python3-click python3-colorama"
-        echo "  pip3 install openai anthropic python-dotenv"
-    elif command -v pacman &> /dev/null; then
-        echo -e "${YELLOW}Detected pacman package manager${NC}"
-        echo "Please install Python dependencies manually:"
-        echo "  sudo pacman -S python-requests python-click python-colorama"
-        echo "  pip install openai anthropic python-dotenv"
-    else
-        echo "Please install the following Python packages manually:"
-        echo "  requests, click, colorama, openai, anthropic, python-dotenv"
-    fi
-    
-    # Try to find a writable location for the script
-    if [[ -w "/usr/local/bin" ]]; then
-        cp "$SCRIPT_DIR/tinycode" "/usr/local/bin/"
-        chmod +x "/usr/local/bin/tinycode"
-        echo -e "${GREEN}✓ tinycode installed to /usr/local/bin/tinycode${NC}"
-    else
-        USER_BIN="$HOME/.local/bin"
-        mkdir -p "$USER_BIN"
-        cp "$SCRIPT_DIR/tinycode" "$USER_BIN/"
-        chmod +x "$USER_BIN/tinycode"
-        echo -e "${GREEN}✓ tinycode installed to $USER_BIN/tinycode${NC}"
-        
-        # Check if user bin is in PATH
-        if [[ ":$PATH:" != *":$USER_BIN:"* ]]; then
-            echo -e "${YELLOW}Note: $USER_BIN is not in your PATH${NC}"
-            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
-            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
-        fi
-    fi
-}
+VENV_DIR="$HOME/.local/share/tinycode/venv"
+INSTALL_DIR="$HOME/.local/bin"
 
 echo -e "${BLUE}tinycode - AI-powered command line generator${NC}"
 echo -e "${BLUE}=============================================${NC}"
@@ -95,66 +46,19 @@ fi
 
 echo -e "${GREEN}✓ Python $PYTHON_VERSION found${NC}"
 
-# Check for pip
-echo -e "${YELLOW}Checking for pip...${NC}"
-PIP_AVAILABLE=false
-PIP_COMMAND=""
-
-# Try different pip commands
-if python3 -c "import pip" &> /dev/null; then
-    PIP_AVAILABLE=true
-    PIP_COMMAND="python3 -m pip"
-    echo -e "${GREEN}✓ pip found (python3 -m pip)${NC}"
-elif command -v pip3 &> /dev/null; then
-    PIP_AVAILABLE=true
-    PIP_COMMAND="pip3"
-    echo -e "${GREEN}✓ pip found (pip3)${NC}"
-elif command -v pip &> /dev/null; then
-    PIP_AVAILABLE=true
-    PIP_COMMAND="pip"
-    echo -e "${GREEN}✓ pip found (pip)${NC}"
-else
-    echo -e "${YELLOW}⚠ pip not found. Attempting to install pip...${NC}"
-    
-    # Try to install pip using get-pip.py
-    if command -v curl &> /dev/null; then
-        echo -e "${YELLOW}Downloading and installing pip...${NC}"
-        curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-        python3 get-pip.py --user
-        rm -f get-pip.py
-        
-        # Check if pip was installed successfully
-        if python3 -c "import pip" &> /dev/null; then
-            PIP_AVAILABLE=true
-            PIP_COMMAND="python3 -m pip"
-            echo -e "${GREEN}✓ pip installed successfully${NC}"
-        else
-            echo -e "${RED}Failed to install pip using get-pip.py${NC}"
-        fi
-    elif command -v wget &> /dev/null; then
-        echo -e "${YELLOW}Downloading and installing pip...${NC}"
-        wget -q https://bootstrap.pypa.io/get-pip.py -O get-pip.py
-        python3 get-pip.py --user
-        rm -f get-pip.py
-        
-        # Check if pip was installed successfully
-        if python3 -c "import pip" &> /dev/null; then
-            PIP_AVAILABLE=true
-            PIP_COMMAND="python3 -m pip"
-            echo -e "${GREEN}✓ pip installed successfully${NC}"
-        else
-            echo -e "${RED}Failed to install pip using get-pip.py${NC}"
-        fi
-    else
-        echo -e "${RED}Error: Neither curl nor wget found. Cannot download pip.${NC}"
-        echo "Please install pip manually:"
-        echo "  Ubuntu/Debian: sudo apt install python3-pip"
-        echo "  CentOS/RHEL: sudo yum install python3-pip"
-        echo "  Fedora: sudo dnf install python3-pip"
-        echo "  Arch: sudo pacman -S python-pip"
-        exit 1
-    fi
+# Check for venv module
+echo -e "${YELLOW}Checking for virtual environment support...${NC}"
+if ! python3 -c "import venv" &> /dev/null; then
+    echo -e "${RED}Error: Python venv module not available${NC}"
+    echo "Please install python3-venv:"
+    echo "  Ubuntu/Debian: sudo apt install python3-venv"
+    echo "  CentOS/RHEL: sudo yum install python3-venv"
+    echo "  Fedora: sudo dnf install python3-venv"
+    echo "  Arch: sudo pacman -S python-virtualenv"
+    exit 1
 fi
+
+echo -e "${GREEN}✓ Virtual environment support available${NC}"
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -171,68 +75,78 @@ if [[ ! -f "$SCRIPT_DIR/requirements.txt" ]]; then
     exit 1
 fi
 
-# Create config directory
-echo -e "${YELLOW}Creating configuration directory...${NC}"
+# Create directories
+echo -e "${YELLOW}Creating installation directories...${NC}"
 mkdir -p "$CONFIG_DIR"
-echo -e "${GREEN}✓ Configuration directory created: $CONFIG_DIR${NC}"
+mkdir -p "$INSTALL_DIR"
+mkdir -p "$(dirname "$VENV_DIR")"
+echo -e "${GREEN}✓ Directories created${NC}"
 
-# Install tinycode
-if [[ "$PIP_AVAILABLE" == "true" ]]; then
-    echo -e "${YELLOW}Installing tinycode using pip...${NC}"
-    cd "$SCRIPT_DIR"
-    
-    # Install in user mode to avoid permission issues
-    $PIP_COMMAND install --user .
-    
-    # Check if installation was successful - look in multiple locations
-    TINYCODE_FOUND=false
-    TINYCODE_PATH=""
-    
-    # Check common locations
-    for path in "$HOME/.local/bin/tinycode" "/usr/local/bin/tinycode" "/usr/bin/tinycode"; do
-        if [[ -f "$path" ]]; then
-            TINYCODE_FOUND=true
-            TINYCODE_PATH="$path"
-            break
-        fi
-    done
-    
-    # Also check if it's in PATH
-    if command -v tinycode &> /dev/null; then
-        TINYCODE_FOUND=true
-        TINYCODE_PATH=$(which tinycode)
-    fi
-    
-    if [[ "$TINYCODE_FOUND" == "true" ]]; then
-        echo -e "${GREEN}✓ tinycode installed successfully${NC}"
-        echo -e "${GREEN}✓ Command available at: $TINYCODE_PATH${NC}"
-        
-        # Check if it's in a standard PATH location
-        if [[ "$TINYCODE_PATH" == *"/usr/local/bin/"* ]] || [[ "$TINYCODE_PATH" == *"/.local/bin/"* ]]; then
-            echo -e "${GREEN}✓ Command is in standard PATH location${NC}"
-        else
-            echo -e "${YELLOW}Note: Command installed to: $TINYCODE_PATH${NC}"
-            echo "Make sure this location is in your PATH"
-        fi
-        
-        # Check if .local/bin is in PATH and warn if not
-        USER_BIN="$HOME/.local/bin"
-        if [[ ":$PATH:" != *":$USER_BIN:"* ]] && [[ -f "$USER_BIN/tinycode" ]]; then
-            echo -e "${YELLOW}Note: $USER_BIN is not in your PATH${NC}"
-            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
-            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
-            echo
-            echo "Or run this command to add it temporarily:"
-            echo -e "${BLUE}export PATH=\"\$PATH:$USER_BIN\"${NC}"
-        fi
-    else
-        echo -e "${RED}Error: tinycode installation failed${NC}"
-        echo "Trying alternative installation method..."
-        _install_manual
-    fi
+# Create virtual environment
+echo -e "${YELLOW}Creating virtual environment...${NC}"
+if [[ -d "$VENV_DIR" ]]; then
+    echo -e "${YELLOW}Virtual environment already exists, removing...${NC}"
+    rm -rf "$VENV_DIR"
+fi
+
+python3 -m venv "$VENV_DIR"
+echo -e "${GREEN}✓ Virtual environment created at $VENV_DIR${NC}"
+
+# Activate virtual environment and install
+echo -e "${YELLOW}Installing tinycode in virtual environment...${NC}"
+cd "$SCRIPT_DIR"
+
+# Activate venv and install
+source "$VENV_DIR/bin/activate"
+pip install --upgrade pip
+pip install -e .
+
+echo -e "${GREEN}✓ tinycode installed in virtual environment${NC}"
+
+# Create wrapper script
+echo -e "${YELLOW}Creating wrapper script...${NC}"
+cat > "$INSTALL_DIR/tinycode" << 'EOF'
+#!/bin/bash
+
+# tinycode wrapper script
+# This script activates the virtual environment and runs tinycode
+
+VENV_DIR="$HOME/.local/share/tinycode/venv"
+PYTHON_SCRIPT="$VENV_DIR/bin/tinycode"
+
+# Check if virtual environment exists
+if [[ ! -f "$PYTHON_SCRIPT" ]]; then
+    echo "Error: tinycode not found in virtual environment"
+    echo "Please reinstall tinycode: ./install.sh"
+    exit 1
+fi
+
+# Execute tinycode from virtual environment
+exec "$PYTHON_SCRIPT" "$@"
+EOF
+
+chmod +x "$INSTALL_DIR/tinycode"
+echo -e "${GREEN}✓ Wrapper script created at $INSTALL_DIR/tinycode${NC}"
+
+# Check if install directory is in PATH
+if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+    echo -e "${YELLOW}Note: $INSTALL_DIR is not in your PATH${NC}"
+    echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
+    echo -e "${BLUE}export PATH=\"\$PATH:$INSTALL_DIR\"${NC}"
+    echo
+    echo "Or run this command to add it temporarily:"
+    echo -e "${BLUE}export PATH=\"\$PATH:$INSTALL_DIR\"${NC}"
+    echo
+fi
+
+# Test installation
+echo -e "${YELLOW}Testing installation...${NC}"
+if "$INSTALL_DIR/tinycode" --version &> /dev/null; then
+    echo -e "${GREEN}✓ Installation test successful${NC}"
 else
-    echo -e "${YELLOW}Pip not available, using manual installation...${NC}"
-    _install_manual
+    echo -e "${RED}✗ Installation test failed${NC}"
+    echo "Please check the installation and try again"
+    exit 1
 fi
 
 echo
@@ -249,5 +163,10 @@ echo "   tinycode --help"
 echo
 echo "3. Try it out:"
 echo "   tinycode \"list all files in current directory\""
+echo
+echo -e "${BLUE}Installation details:${NC}"
+echo "  Virtual environment: $VENV_DIR"
+echo "  Wrapper script: $INSTALL_DIR/tinycode"
+echo "  Configuration: $CONFIG_DIR"
 echo
 echo -e "${BLUE}For more information, visit: https://github.com/your-repo/tinycode${NC}" 
