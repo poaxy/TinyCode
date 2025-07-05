@@ -102,7 +102,7 @@ pip install --upgrade pip
 pip install -e .
 
 echo -e "${GREEN}✓ tinycode installed in virtual environment${NC}"
-
+    
 # Create wrapper script
 echo -e "${YELLOW}Creating wrapper script...${NC}"
 cat > "$INSTALL_DIR/tinycode" << 'EOF'
@@ -113,7 +113,7 @@ cat > "$INSTALL_DIR/tinycode" << 'EOF'
 
 VENV_DIR="$HOME/.local/share/tinycode/venv"
 PYTHON_SCRIPT="$VENV_DIR/bin/tinycode"
-
+    
 # Check if virtual environment exists
 if [[ ! -f "$PYTHON_SCRIPT" ]]; then
     echo "Error: tinycode not found in virtual environment"
@@ -127,17 +127,17 @@ EOF
 
 chmod +x "$INSTALL_DIR/tinycode"
 echo -e "${GREEN}✓ Wrapper script created at $INSTALL_DIR/tinycode${NC}"
-
+        
 # Check if install directory is in PATH
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo -e "${YELLOW}Note: $INSTALL_DIR is not in your PATH${NC}"
-    echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
+            echo "Add this line to your shell profile (.bashrc, .zshrc, etc.):"
     echo -e "${BLUE}export PATH=\"\$PATH:$INSTALL_DIR\"${NC}"
     echo
     echo "Or run this command to add it temporarily:"
     echo -e "${BLUE}export PATH=\"\$PATH:$INSTALL_DIR\"${NC}"
     echo
-fi
+        fi
 
 # Test installation
 echo -e "${YELLOW}Testing installation...${NC}"
@@ -169,4 +169,4 @@ echo "  Virtual environment: $VENV_DIR"
 echo "  Wrapper script: $INSTALL_DIR/tinycode"
 echo "  Configuration: $CONFIG_DIR"
 echo
-echo -e "${BLUE}For more information, visit: https://github.com/your-repo/tinycode${NC}" 
+echo -e "${BLUE}For more information, visit: https://github.com/poaxy/tinycode${NC}" 

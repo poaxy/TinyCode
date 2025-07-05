@@ -2,12 +2,12 @@ Metadata-Version: 2.4
 Name: tinycode
 Version: 1.0.0
 Summary: AI-powered command line generator using ChatGPT and Claude APIs
-Home-page: https://github.com/your-repo/tinycode
+Home-page: https://github.com/poaxy/tinycode
 Author: Your Name
 Author-email: your.email@example.com
-Project-URL: Bug Reports, https://github.com/your-repo/tinycode/issues
-Project-URL: Source, https://github.com/your-repo/tinycode
-Project-URL: Documentation, https://github.com/your-repo/tinycode#readme
+Project-URL: Bug Reports, https://github.com/poaxy/tinycode/issues
+Project-URL: Source, https://github.com/poaxy/tinycode
+Project-URL: Documentation, https://github.com/poaxy/tinycode#readme
 Keywords: cli,ai,command-line,linux,openai,claude,automation
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
@@ -63,7 +63,7 @@ AI-powered command line generator that uses ChatGPT and Claude APIs to generate 
 
 ```bash
 # Clone or download the repository
-git clone https://github.com/your-repo/tinycode.git
+git clone https://github.com/poaxy/tinycode.git
 cd tinycode
 
 # Run the installation script

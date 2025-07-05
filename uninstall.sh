@@ -53,10 +53,10 @@ fi
 echo -e "${YELLOW}Do you want to remove configuration files? (y/N)${NC}"
 read -r response
 if [[ "$response" =~ ^[Yy]$ ]]; then
-    if [[ -d "$CONFIG_DIR" ]]; then
-        echo -e "${YELLOW}Removing configuration directory...${NC}"
-        rm -rf "$CONFIG_DIR"
-        echo -e "${GREEN}✓ Configuration directory removed${NC}"
+if [[ -d "$CONFIG_DIR" ]]; then
+    echo -e "${YELLOW}Removing configuration directory...${NC}"
+    rm -rf "$CONFIG_DIR"
+    echo -e "${GREEN}✓ Configuration directory removed${NC}"
     fi
 else
     echo -e "${BLUE}Configuration files preserved at: $CONFIG_DIR${NC}"

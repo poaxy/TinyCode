@@ -24,7 +24,7 @@ setup(
     description="AI-powered command line generator using ChatGPT and Claude APIs",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/your-repo/tinycode",
+    url="https://github.com/poaxy/tinycode",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[
@@ -53,8 +53,8 @@ setup(
     zip_safe=False,
     keywords="cli, ai, command-line, linux, openai, claude, automation",
     project_urls={
-        "Bug Reports": "https://github.com/your-repo/tinycode/issues",
-        "Source": "https://github.com/your-repo/tinycode",
-        "Documentation": "https://github.com/your-repo/tinycode#readme",
+        "Bug Reports": "https://github.com/poaxy/tinycode/issues",
+        "Source": "https://github.com/poaxy/tinycode",
+        "Documentation": "https://github.com/poaxy/tinycode#readme",
     },
 ) 

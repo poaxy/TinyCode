@@ -282,7 +282,7 @@ FEATURES:
     • Single-line command output
     • Copy to clipboard support
 
-For more information, visit: https://github.com/your-repo/tinycode
+For more information, visit: https://github.com/poaxy/tinycode
 """
         print(help_text)
 

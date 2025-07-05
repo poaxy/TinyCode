@@ -112,7 +112,7 @@ All notable changes to the tinycode project will be documented in this file.
 ### For Users
 ```bash
 # Quick install
-git clone https://github.com/your-repo/tinycode.git
+git clone https://github.com/poaxy/tinycode.git
 cd tinycode
 ./install.sh
 
@@ -127,7 +127,7 @@ tinycode --set-api-key claude YOUR_CLAUDE_KEY
 ### For Developers
 ```bash
 # Development setup
-git clone https://github.com/your-repo/tinycode.git
+git clone https://github.com/poaxy/tinycode.git
 cd tinycode
 ./dev-setup.sh
 source venv/bin/activate
