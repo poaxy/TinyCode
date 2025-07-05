@@ -325,7 +325,7 @@ cd "$SCRIPT_DIR"
 # Activate venv and install
 source "$VENV_DIR/bin/activate"
 pip install --upgrade pip
-pip install -e .
+pip install .
 
 echo -e "${GREEN}✓ tinycode installed in virtual environment${NC}"
     
